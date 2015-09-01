@@ -1,0 +1,6 @@
+
+*.local
+*.bak
+_*
+vendor
+example/local

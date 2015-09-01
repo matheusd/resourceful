@@ -1,0 +1,12 @@
+{
+    "name": "matheusd/resourceful",
+    "require": {
+        "peej/tonic": "dev-master",
+        "zendframework/zend-diactoros": "^1.1",
+        "pimple/pimple": "^3.0",
+        "nikic/fast-route": "^0.6.0",
+        "smarty/smarty": "^3.1",
+        "monolog/monolog": "^1.17",
+        "doctrine/orm": "^2.5"
+    }
+}
