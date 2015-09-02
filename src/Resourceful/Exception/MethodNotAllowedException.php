@@ -1,6 +1,6 @@
 <?php
 
-namespace Resourceful;
+namespace Resourceful\Exception;
 
 class MethodNotAllowedException extends \Exception {
     public $allowedMethods = [];

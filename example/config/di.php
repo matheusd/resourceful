@@ -17,6 +17,7 @@ class WebAppDIProvider implements Pimple\ServiceProviderInterface
             '/test',
             '/index',
             '/form',
+            '/exception',
         ];        
         
         $c['entityManager'] = function ($c) {
@@ -39,15 +40,11 @@ class WebAppDIProvider implements Pimple\ServiceProviderInterface
             return $dispatcher;
         };
         
-        $c['request'] = function ($c) {
+        $c['request'] = function ($c) {            
             $req = Zend\Diactoros\ServerRequestFactory::fromGlobals(
-                $_SERVER,
-                $_GET,
-                $_POST,
-                $_COOKIE,
-                $_FILES
+                $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
             );     
-            $c['logger']->notice('Started ' . $req->getMethod() . ' ' . $req->getUri()->getPath());
+            $c['logger']->notice('Started ' . $req->getMethod() . ' ' . $req->getUri()->getPath());            
             return $req;
         };
         
@@ -124,10 +121,20 @@ class WebAppDIProvider implements Pimple\ServiceProviderInterface
         };
         
         $c['handleException'] = $c->protect(function ($e) use ($c) {
-            $html = "<p>Internal Server Error</p>" .
-                "<pre>".$e."</pre>";
-            $resp = new Zend\Diactoros\Response\HtmlResponse($html, 500);
             $c['logger']->error($e);
+            
+            $exceptionBuilder = new \Resourceful\Exception\ExceptionResponseBuilder();
+            $exceptionBuilder->includeStackTrace = $c['config/devVersion'];
+            $exceptionBuilder->responseFactory = $c['responseFactory'];
+            
+            $request = null;
+            try {
+                $request = $c['request'];
+            } catch (Exception $e) {
+                //ignore and just use a null request
+            }            
+                        
+            $resp = $exceptionBuilder->buildResponse($e, $request);                        
             return $resp;
         });        
  
@@ -146,6 +153,7 @@ class WebAppDIProvider implements Pimple\ServiceProviderInterface
         
         $c['route/index'] = $mkres('ExampleApp\Home\Control\IndexResource');
         $c['route/form'] = $mkres('ExampleApp\Home\Control\FormResource');
+        $c['route/exception'] = $mkres('ExampleApp\Home\Control\ExceptionResource');
                 
     }
 }

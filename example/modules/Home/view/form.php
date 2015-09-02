@@ -9,7 +9,8 @@
 
 
 <script>
-    function ajaxPost() {
+    function ajaxPost() {   
+        alert('hehe');
         $.ajax({method: 'POST',
             url: '/form',            
             contentType: "application/json; charset=utf-8",
@@ -19,6 +20,7 @@
                 alert("Success!");
             }
         });
+        return false;
     }
     
     function setupForm() {
