@@ -9,6 +9,11 @@
             "role": "Developer"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Resourceful\\": "src/resourceful/"
+        }
+    },
     "require": {
         "zendframework/zend-diactoros": "^1.1"      
     },
