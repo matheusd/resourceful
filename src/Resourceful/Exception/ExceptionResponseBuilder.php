@@ -41,7 +41,7 @@ class ExceptionResponseBuilder extends \Resourceful\RestfulWebAppResource {
         return $resp;
     }
     
-    protected function exceptionToData($exception) {
+    protected function exceptionToData($exception) {        
         $res = [
             'status' => 'error',
             'errorMsg' => $exception->getMessage(),
@@ -52,6 +52,9 @@ class ExceptionResponseBuilder extends \Resourceful\RestfulWebAppResource {
         ];
         if ($exception->getPrevious()) {
             $res['previous'] = $this->exceptionData($exception);
+        }       
+        if ($exception instanceof WebAppDataException) {
+            $res = array_merge($res, $exception->exceptionData());
         }
         return $res;
     }
