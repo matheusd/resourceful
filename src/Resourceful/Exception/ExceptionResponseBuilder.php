@@ -51,11 +51,11 @@ class ExceptionResponseBuilder extends \Resourceful\RestfulWebAppResource {
             'previous' => null,
         ];
         if ($exception->getPrevious()) {
-            $res['previous'] = $this->exceptionData($exception);
+            $res['previous'] = $this->exceptionToData($exception->getPrevious());
         }       
-        if ($exception instanceof WebAppDataException) {
+        if ($exception instanceof WebAppDataException) {            
             $res = array_merge($res, $exception->exceptionData());
-        }
+        }        
         return $res;
     }
     

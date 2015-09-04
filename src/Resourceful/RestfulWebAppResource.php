@@ -72,6 +72,7 @@ class RestfulWebAppResource extends WebAppResource {
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->decodeRequestData();
         }
+        parent::beforeExec();
     }
 
     public function to_json($responseData) {

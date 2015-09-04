@@ -9,12 +9,28 @@ class WebAppResource {
     public $request;
     
     public $parameters;
-    
-    protected function beforeExec() {
-        return null;
+        
+    protected function beforeExec() {        
+        $methods = get_class_methods($this);
+        $fbefMethods = array_filter($methods, function ($i) {
+            return stripos($i, "fbef_") === 0;
+        });
+        foreach ($fbefMethods as $method) {
+            $resp = $this->$method();
+            if ($resp !== null) {
+                return $resp;
+            }
+        }
     }
     
     protected function afterExec($response) {
+        $methods = get_class_methods($this);
+        $faefMethods = array_filter($methods, function ($i) {
+            return stripos($i, "faft_") === 0;
+        });
+        foreach ($faefMethods as $method) {
+            $response = $this->$method($response);
+        }
         return $response;
     }
     
@@ -29,9 +45,9 @@ class WebAppResource {
         return $methodName;
     }    
         
-    public function responseDataToResponse($responseData) {
+    public function responseDataToResponse($responseData) {        
         list($forceType, $acceptString) = $this->decodeRequestPathAndAccept($this->request);
-        $methodName = $this->mostAcceptableResponseFunction($forceType, $acceptString);
+        $methodName = $this->mostAcceptableResponseFunction($forceType, $acceptString);        
         
         if (method_exists($this, $methodName)) {
             return $this->$methodName($responseData);
@@ -41,8 +57,13 @@ class WebAppResource {
     }
     
     public function exec() {
-        $response = $this->beforeExec();
-        if ($response) {
+        $responseData = $this->beforeExec();        
+        if ($responseData !== null) {
+            $this->responseData = $responseData;                
+            if (!($responseData instanceof \Psr\Http\Message\ResponseInterface)) {                        
+                $response = $this->responseDataToResponse($responseData);                
+            }
+            $response = $this->afterExec($response);        
             return $response;
         }
         
@@ -51,14 +72,16 @@ class WebAppResource {
             $ex = new Exception\MethodNotAllowedException("Method '$method' is not allowed on resource " . get_class($this));
             $ex->allowedMethods = $this->listAllowedMethods();
             throw $ex;
-        }
+        }        
         $responseData = $this->$method();
-        $this->responseData = $responseData;
-        if (!$responseData instanceof Psr\Http\Message\ResponseInterface) {
+        $this->responseData = $responseData;                
+        if (!($responseData instanceof \Psr\Http\Message\ResponseInterface)) {            
             $response = $this->responseDataToResponse($responseData);
+        } else {
+            $response = $responseData;
         }
         
-        $response = $this->afterExec($response);
+        $response = $this->afterExec($response);        
         
         return $response;
     }       
