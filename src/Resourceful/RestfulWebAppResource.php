@@ -29,7 +29,7 @@ class RestfulWebAppResource extends WebAppResource {
                 case JSON_ERROR_UTF8: $error = 'Malformed UTF-8 characters, possibly incorrectly encoded'; break;
                 default: "Unrecognized error: $res";
             }
-            throw new WebAppJsonDecodeException($error);
+            throw new Exception\WebAppJsonDecodeException($error);
         }
     }
     
@@ -41,8 +41,8 @@ class RestfulWebAppResource extends WebAppResource {
     protected function protectData($data) {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                if (is_array($v) || is_bject($v)) {
-                    $data[$k] = $this->protectedData($v);
+                if (is_array($v) || is_object($v)) {
+                    $data[$k] = $this->protectData($v);
                 } else {
                     $data[$k] = $this->quote($str);
                 }
