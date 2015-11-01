@@ -44,29 +44,33 @@ class RestfulWebAppResource extends WebAppResource {
                 if (is_array($v) || is_object($v)) {
                     $data[$k] = $this->protectData($v);
                 } else {
-                    $data[$k] = $this->quote($str);
+                    $data[$k] = $this->quote($v);
                 }
             }
         } else {
             foreach ($data as $k => $v) {
-                $data->$k  = $this->quote($v);
+                if (is_array($v) || is_object($v)) {
+                    $data->$k  = $this->protectData($v);
+                } else {
+                    $data->$k = $this->quote($v);
+                }
             }
         }
         return $data;
     }
 
     protected function decodeRequestData() {
-        $ctype = $this->request->getHeaderLine('Content-Type');
+        $ctype = $this->request->getHeaderLine('Content-Type');        
         if ($ctype == "application/x-www-form-urlencoded" ||
             stripos($ctype, "multipart/form-data;") === 0)
         {
-            $data = $this->decodeFormData(); 
+            $data = $this->decodeFormData();
         } else {
             $data = json_decode($this->request->getBody());
-            $this->checkJsonDecodeErrors();           
+            $this->checkJsonDecodeErrors();
         }
-        $this->data = $this->protectData($data);        
-    }
+            $this->data = $this->protectData($data);
+    }        
 
     protected function beforeExec() {
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
