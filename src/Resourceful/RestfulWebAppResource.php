@@ -80,7 +80,12 @@ class RestfulWebAppResource extends WebAppResource {
     }
 
     public function to_json($responseData) {
-        return $this->responseFactory->newJsonResponse($responseData);
+        $res = $this->responseFactory->newJsonResponse($responseData);
+        if ($this->request->getMethod('OPTIONS')) {
+            $methods = implode(',', array_map('strtoupper', $this->listAllowedMethods()));
+            $res = $res->withHeader("Allow", $methods);
+        }
+        return $res;
     }
     
     public function to_html($responseData) {
@@ -89,7 +94,15 @@ class RestfulWebAppResource extends WebAppResource {
         } else {
             $body = "<pre>".print_r($responseData, true)."</pre>";
         }                
-        return $this->responseFactory->newHtmlResponse($body);
-        
+        $res = $this->responseFactory->newHtmlResponse($body);
+        if ($this->request->getMethod('OPTIONS')) {
+            $methods = implode(',', array_map('strtoupper', $this->listAllowedMethods()));
+            $res = $res->withHeader("Allow", $methods);
+        }
+        return $res;
+    }
+
+    public function options() {
+        return [];
     }
 }

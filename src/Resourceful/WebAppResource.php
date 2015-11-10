@@ -42,7 +42,7 @@ class WebAppResource {
                 $res[] = $methodName;
             }
         }
-        return $methodName;
+        return $res;
     }    
         
     public function responseDataToResponse($responseData) {        
