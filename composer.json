@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Resourceful\\": "src/resourceful/"
+            "Resourceful\\": "src/Resourceful/"
         }
     },
     "require": {
