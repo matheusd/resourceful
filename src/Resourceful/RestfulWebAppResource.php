@@ -47,7 +47,7 @@ class RestfulWebAppResource extends WebAppResource {
                     $data[$k] = $this->quote($v);
                 }
             }
-        } else {
+        } else if (!empty($data)) {
             foreach ($data as $k => $v) {
                 if (is_array($v) || is_object($v)) {
                     $data->$k  = $this->protectData($v);
